@@ -1,0 +1,18 @@
+[package]
+name = "memset-kani"
+version = "0.1.0"
+edition = "2024"
+
+[target.'cfg(kani_ra)'.dependencies]
+kani = { git = "https://github.com/model-checking/kani" }
+
+[dependencies]
+softcore-asm-rv64 = "0.2.0"
+softcore-rv64 = "0.6.0"
+
+[features]
+userspace = []
+
+[patch.crates-io]
+softcore-rv64 = { git = "https://github.com/CharlyCst/softcore-rs.git", branch = "vector" }
+softcore-asm-rv64 = { git = "https://github.com/CharlyCst/softcore-asm.git", branch = "vector" }
