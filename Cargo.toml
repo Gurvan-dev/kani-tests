@@ -6,13 +6,20 @@ edition = "2024"
 [target.'cfg(kani_ra)'.dependencies]
 kani = { git = "https://github.com/model-checking/kani" }
 
+[package.metadata.verus]
+verify = true
+
 [dependencies]
-softcore-asm-rv64 = "0.2.0"
+softcore-asm-rv64 = "0.3.0"
 softcore-rv64 = "0.6.0"
+vstd = "0.0.0-2026-05-17-0151"
 
 [features]
 userspace = []
 
+[workspace.lints.rust]
+unexpected_cfgs = { level = "warn",  check-cfg = ["cfg(kani)"] }
+
 [patch.crates-io]
-softcore-rv64 = { git = "https://github.com/CharlyCst/softcore-rs.git", branch = "vector" }
-softcore-asm-rv64 = { git = "https://github.com/CharlyCst/softcore-asm.git", branch = "vector" }
+softcore-rv64 = { path = "../softcore-rs/rv64" }
+softcore-asm-rv64 = { path = "../softcore-asm" }
