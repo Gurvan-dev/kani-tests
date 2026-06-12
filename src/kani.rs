@@ -110,7 +110,7 @@ fn check_vec_asm_set_partial() {
     kani::assume(len_fill <= LEN);
     kani::assume(LEN == inp.len());
 
-    let vl = vec_set_partial::<FILL_VALUE>(&mut inp, len_fill);
+    let vl = vec_set_partial(&mut inp, len_fill, FILL_VALUE);
 
     for i in 0..vl {
         assert_eq!(inp[i], FILL_VALUE);

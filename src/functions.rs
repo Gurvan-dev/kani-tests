@@ -200,3 +200,11 @@ fn check_vec_asm_set() {
         }
     }
 }
+
+fn jump() -> i32 {
+    soft_asm!(
+        "tmp:",
+        "j tmp"
+    );
+    32
+}
