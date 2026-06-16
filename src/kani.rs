@@ -110,9 +110,83 @@ fn check_vec_asm_set_partial() {
     kani::assume(len_fill <= LEN);
     kani::assume(LEN == inp.len());
 
-    let vl = vec_set_partial(&mut inp, len_fill, FILL_VALUE);
+    let vl = vec_set_asm_partial(&mut inp, len_fill, FILL_VALUE);
 
     for i in 0..vl {
+        assert_eq!(inp[i], FILL_VALUE);
+    }
+}
+
+pub fn vec_set_pure(inp: &mut [u8], fill_value: u8) {
+    let mut i = inp.len();
+    let mut inp: &mut [u8] = inp;
+    while 0 < i {
+        inp[0] = fill_value;
+        inp = &mut inp[1..];
+        i -= 1;
+    }
+}
+
+pub fn vec_set_pure_unsafe_ptr(inp: &mut [u8], fill_value: u8) {
+    let mut i = inp.len();
+    let mut inp: &mut [u8] = inp;
+    while 0 < i {
+        unsafe { *inp.as_mut_ptr() = fill_value };
+        inp = &mut inp[1..];
+        i -= 1;
+    }
+}
+
+pub fn vec_set_pure_unsafe_ptr_addition(inp: &mut [u8], fill_value: u8) {
+    let mut i = inp.len();
+    let mut inp: *mut u8 = inp.as_mut_ptr();
+    while 0 < i {
+        unsafe {
+            *inp = fill_value;
+            inp = inp.wrapping_add(1);
+            i -= 1;
+        };
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn check_vec_set_pure() {
+    const LEN: usize = 32;
+    let FILL_VALUE: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    let vl = vec_set_pure(&mut inp, FILL_VALUE);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], FILL_VALUE);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn check_vec_set_pure_unsafe_ptr() {
+    const LEN: usize = 32;
+    let FILL_VALUE: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    let vl = vec_set_pure_unsafe_ptr(&mut inp, FILL_VALUE);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], FILL_VALUE);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn check_vec_set_pure_unsafe_ptr_addition() {
+    const LEN: usize = 32;
+    let FILL_VALUE: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    let vl = vec_set_pure_unsafe_ptr_addition(&mut inp, FILL_VALUE);
+
+    for i in 0..inp.len() {
         assert_eq!(inp[i], FILL_VALUE);
     }
 }

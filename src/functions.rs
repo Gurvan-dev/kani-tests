@@ -104,7 +104,7 @@ pub fn vec_add_second_pure(mut inp1: &[u8], mut inp2: &mut [u8], mut len: usize)
     assert!(len == 0);
 }
 
-pub fn vec_set_partial(inp: &mut [u8], len: usize, fill_value: u8) -> usize {
+pub fn vec_set_asm_partial(inp: &mut [u8], len: usize, fill_value: u8) -> usize {
     let vl: usize;
 
     assert!(len <= inp.len());
@@ -129,13 +129,13 @@ pub fn vec_set_partial(inp: &mut [u8], len: usize, fill_value: u8) -> usize {
     return vl;
 }
 
-pub fn vec_set(inp: &mut [u8], mut len: usize, fill_value: u8) {
+pub fn vec_set_asm(inp: &mut [u8], mut len: usize, fill_value: u8) {
     assert!(len <= inp.len());
 
     let mut vl: usize;
     let mut inp: &mut [u8] = inp;
     while 0 < len {
-        vl = vec_set_partial(inp, len, fill_value);
+        vl = vec_set_asm_partial(inp, len, fill_value);
         assert!(0 < vl);
         inp = &mut inp[vl..];
         len -= vl;
@@ -177,7 +177,7 @@ fn check_vec_asm_set_partial() {
 }
 
 #[test]
-fn check_vec_asm_set() {
+fn check_vec_set_asm() {
     const MAX_LEN: usize = 64;
     const FILL_VALUE: u8 = 0;
 
@@ -187,7 +187,7 @@ fn check_vec_asm_set() {
                 .map(|i| (i.wrapping_add(seed as usize)) as u8)
                 .collect();
 
-            vec_set(&mut inp, len, FILL_VALUE);
+            vec_set_asm(&mut inp, len, FILL_VALUE);
 
             for i in 0..len {
                 assert_eq!(
