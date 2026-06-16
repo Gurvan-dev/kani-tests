@@ -95,12 +95,12 @@ pub fn memload8(addr: *mut u8, regidx: RegIdx) {
     wv_extend(regidx, elements);
 }
 
-// TODO: Address should be passed as a BitVector here probably, that might be the problem
-pub fn memstore8(addr: *mut u8, regidx: RegIdx) {
+pub fn memstore8(addr: BitDynamic, regidx: RegIdx) {
     let vl = unsafe { ELEM_COUNT_CURRENT };
     let reg_val = rv(regidx);
+    let addr = addr.unsigned() as usize;
     for i in 0..vl {
-        let addr = addr.wrapping_add(i);
+        let addr = core::ptr::with_exposed_provenance_mut::<u8>(addr.wrapping_add(i));
         unsafe {
             *addr = reg_val.get_subrange(((i + 1) * 8) as i128, (i * 8) as i128).to_raw_le()[0];
         }

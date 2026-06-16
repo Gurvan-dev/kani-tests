@@ -8,7 +8,7 @@ fn memset(mut input: &mut [u8], value: u8) {
     while 0 < len {
         let vl = minimal::vset(input.len());
         minimal::memmove(minimal::RegIdx::V1, bvd(minimal::ELEM_SIZE as i128, value as u64));
-        minimal::memstore8(input.as_mut_ptr(), minimal::RegIdx::V1);
+        minimal::memstore8(bvd(64, input.as_mut_ptr() as u64), minimal::RegIdx::V1);
         input = &mut input[vl..];
         len -= vl;
     }
