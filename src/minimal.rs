@@ -1,56 +1,104 @@
 use softcore_rv64::prelude::*;
 
 pub const ELEM_COUNT_MAX: usize = 4;
-pub const ELEM_SIZE: usize = 8;
+pub const ELEM_SIZE: usize = 64;
+pub const REG_SIZE: i128 = ELEM_SIZE as i128;
 pub const VECTOR_REG_SIZE: i128 = (ELEM_COUNT_MAX * ELEM_SIZE) as i128;
 
-pub enum RegIdx {
+#[derive(Copy, Clone)]
+pub enum VecSize {
+    S8,
+    S16,
+    S32,
+    S64,
+}
+
+pub enum RegIdxVec {
     V0,
     V1,
     V2,
     V3,
 }
 
+pub enum RegIdx {
+    X0,
+    X1,
+    X2,
+    X3,
+}
+
 /* State */
 
-static mut ELEM_COUNT_CURRENT: usize = ELEM_COUNT_MAX - 1;
+static mut VL: usize = ELEM_COUNT_MAX - 1;
+static mut SEW: VecSize = VecSize::S8;
 static mut V1: BitDynamic = BitDynamic::zeros(VECTOR_REG_SIZE);
 static mut V2: BitDynamic = BitDynamic::zeros(VECTOR_REG_SIZE);
 static mut V3: BitDynamic = BitDynamic::zeros(VECTOR_REG_SIZE);
 
-/* Reading and writing to vector registers without extensions */
+static mut X1: BitDynamic = BitDynamic::zeros(REG_SIZE);
+static mut X2: BitDynamic = BitDynamic::zeros(REG_SIZE);
+static mut X3: BitDynamic = BitDynamic::zeros(REG_SIZE);
 
-fn rv(reg: RegIdx) -> BitDynamic {
-    match reg {
-        RegIdx::V0 => BitDynamic::zeros(VECTOR_REG_SIZE),
-        RegIdx::V1 => unsafe { V1 },
-        RegIdx::V2 => unsafe { V2 },
-        RegIdx::V3 => unsafe { V3 },
+/* Utils */
+
+fn sew() -> usize {
+    match unsafe { SEW } {
+        VecSize::S8 => 1,
+        VecSize::S16 => 2,
+        VecSize::S32 => 3,
+        VecSize::S64 => 4,
     }
 }
 
-fn wv(reg: RegIdx, v: BitDynamic) {
+fn vl() -> usize {
+    unsafe { VL }
+}
+
+/* Reading and writing to registers without extensions */
+
+pub fn rv(reg: RegIdxVec) -> BitDynamic {
     match reg {
-        RegIdx::V0 => (),
-        RegIdx::V1 => unsafe { V1 = v },
-        RegIdx::V2 => unsafe { V2 = v },
-        RegIdx::V3 => unsafe { V3 = v },
+        RegIdxVec::V0 => BitDynamic::zeros(VECTOR_REG_SIZE),
+        RegIdxVec::V1 => unsafe { V1 },
+        RegIdxVec::V2 => unsafe { V2 },
+        RegIdxVec::V3 => unsafe { V3 },
+    }
+}
+
+pub fn rx(reg: RegIdx) -> BitDynamic {
+    match reg {
+        RegIdx::X0 => BitDynamic::zeros(REG_SIZE),
+        RegIdx::X1 => unsafe { X1 },
+        RegIdx::X2 => unsafe { X2 },
+        RegIdx::X3 => unsafe { X3 },
+    }
+}
+
+pub fn wv(reg: RegIdxVec, v: BitDynamic) {
+    assert!(v.len() == VECTOR_REG_SIZE);
+    match reg {
+        RegIdxVec::V0 => (),
+        RegIdxVec::V1 => unsafe { V1 = v },
+        RegIdxVec::V2 => unsafe { V2 = v },
+        RegIdxVec::V3 => unsafe { V3 = v },
+    }
+}
+
+pub fn wx(reg: RegIdx, v: BitDynamic) {
+    assert!(v.len() == REG_SIZE);
+    match reg {
+        RegIdx::X0 => (),
+        RegIdx::X1 => unsafe { X1 = v },
+        RegIdx::X2 => unsafe { X2 = v },
+        RegIdx::X3 => unsafe { X3 = v },
     }
 }
 
 /* Reading and writing to vector registers with extensions */
 
-fn vectobit(v: BoundedVec<BitDynamic, ELEM_COUNT_MAX>) -> BitDynamic {
-    let mut res = BitDynamic::new(VECTOR_REG_SIZE, 0);
-    for i in 0..v.len() {
-        assert!(v[i].len() == ELEM_SIZE as i128);
-        res = res.set_subrange(v[i], ((i + 1) * ELEM_SIZE - 1) as u64, (i * ELEM_SIZE) as u64); // TODO: Should not be `i` here
-    }
-    res
-}
-
-fn rv_extend(reg: RegIdx) -> BoundedVec<BitDynamic, ELEM_COUNT_MAX> {
-    let vl = unsafe { ELEM_COUNT_CURRENT };
+/* TODO: Not used for now
+fn rv_extend(reg: RegIdxVec) -> BoundedVec<BitDynamic, ELEM_COUNT_MAX> {
+    let vl = unsafe { VL };
     let reg_val = rv(reg);
     let mut res = BoundedVec::new();
     for i in 0..vl {
@@ -58,23 +106,39 @@ fn rv_extend(reg: RegIdx) -> BoundedVec<BitDynamic, ELEM_COUNT_MAX> {
     }
     res
 }
+*/
 
-fn wv_extend(reg: RegIdx, v: BoundedVec<BitDynamic, ELEM_COUNT_MAX>) {
-    wv(reg, vectobit(v))
+fn wv_extend(reg: RegIdxVec, vs: BoundedVec<BitDynamic, ELEM_COUNT_MAX>) {
+    let mut res = BitDynamic::new(VECTOR_REG_SIZE, 0);
+    let mut size: i128 = 0;
+    for i in 0..vs.len() {
+        res = res.set_subrange(vs[i], (size + vs[i].len() - 1) as u64, size as u64);
+        size += vs[i].len();
+    }
+    wv(reg, res);
 }
 
 /* Instructions */
 
-pub fn vset(i: usize) -> usize {
+pub fn xmove(regidx: RegIdx, value: BitDynamic) {
+    assert!(value.len() == REG_SIZE);
+    wx(regidx, value);
+}
+
+/* Vector Instructions */
+
+pub fn vset(count: usize, sew: VecSize) -> usize {
     unsafe {
-        ELEM_COUNT_CURRENT = i.min(ELEM_COUNT_MAX - 1);
-        ELEM_COUNT_CURRENT
+        VL = count.min(ELEM_COUNT_MAX - 1);
+        SEW = sew;
+        VL
     }
 }
 
-pub fn memmove(regidx: RegIdx, value: BitDynamic) {
-    let vl = unsafe { ELEM_COUNT_CURRENT };
-    assert!(value.len() == ELEM_SIZE as i128);
+pub fn vxmove(regidx: RegIdxVec, value: BitDynamic) {
+    let vl = vl();
+    let sew = sew();
+    assert!(value.len() == 8 * sew as i128);
     assert!(vl < ELEM_COUNT_MAX);
     let mut elements: BoundedVec<BitDynamic, ELEM_COUNT_MAX> = BoundedVec::new();
     for _ in 0..vl {
@@ -83,8 +147,8 @@ pub fn memmove(regidx: RegIdx, value: BitDynamic) {
     wv_extend(regidx, elements);
 }
 
-pub fn memload8(addr: *mut u8, regidx: RegIdx) {
-    let vl = unsafe { ELEM_COUNT_CURRENT };
+pub fn vload8(addr: *mut u8, regidx: RegIdxVec) {
+    let vl = vl();
     let mut elements: BoundedVec<BitDynamic, ELEM_COUNT_MAX> = BoundedVec::new();
 
     for i in 0..vl {
@@ -95,14 +159,16 @@ pub fn memload8(addr: *mut u8, regidx: RegIdx) {
     wv_extend(regidx, elements);
 }
 
-pub fn memstore8(addr: BitDynamic, regidx: RegIdx) {
-    let vl = unsafe { ELEM_COUNT_CURRENT };
+pub fn vstore8(addr: RegIdx, regidx: RegIdxVec) {
+    let vl = vl();
+    let sew = sew();
     let reg_val = rv(regidx);
-    let addr = addr.unsigned() as usize;
+    let addr = rx(addr).unsigned() as usize;
     for i in 0..vl {
-        let addr = core::ptr::with_exposed_provenance_mut::<u8>(addr.wrapping_add(i));
+        let addr = core::ptr::with_exposed_provenance_mut::<u8>(addr.wrapping_add(i * sew));
+        let value = reg_val.get_subrange(((i + 1) * 8 * sew) as i128, (i * 8 * sew) as i128).to_raw_le()[0];
         unsafe {
-            *addr = reg_val.get_subrange(((i + 1) * 8) as i128, (i * 8) as i128).to_raw_le()[0];
+            *addr = value;
         }
     }
 }
