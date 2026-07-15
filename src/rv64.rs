@@ -1,4 +1,224 @@
+use softcore_asm_rv64::softcore_init;
+use softcore_rv64::prelude::{bvd, BitDynamic, BoundedVec};
+use softcore_rv64::{Core, config, new_core};
 
-fn memset(inp: &mut[u8], value: u8) {
+const CONFIG: softcore_rv64::raw::Config = config::VECTOR_TEST;
+softcore_init!(CONFIG);
 
+macro_rules! soft_asm {
+    ($($asm:tt)*) => {
+        softcore_asm_rv64::asm!(
+            $($asm)*,
+            softcore(self)
+        )
+    };
 }
+
+pub fn memset1(inp: &mut [u8], fill_value: u8) {
+    let mut len = inp.len();
+    let mut inp: &mut [u8] = inp;
+
+    while 0 < len {
+        let vl: usize;
+        unsafe {
+            soft_asm!(
+                "vsetvli {vl}, {len}, e8, m1, ta, ma",
+                "vmv.v.x v0, {fill}",
+                "vse8.v v0, ({ptr})",
+
+                vl = out(reg) vl,
+                fill = in(reg) fill_value,
+                len = in(reg) len,
+                ptr = in(reg) inp.as_ptr(),
+                out("v0") _,
+                out("v8") _
+            );
+            inp = &mut inp[vl..];
+            len -= vl;
+        }
+    }
+}
+
+pub fn memset2(inp: &mut [u8], fill_value: u8) {
+    let mut len = inp.len();
+    let mut inp: &mut [u8] = inp;
+
+    while 0 < len {
+        unsafe {
+            soft_asm!(
+                "sb {fill_value} ({ptr})",
+                fill_value = in(reg) fill_value,
+                ptr = in(reg) inp.as_ptr(),
+            );
+            inp = &mut inp[1..];
+            len -= 1;
+        }
+    }
+}
+
+pub fn add1(inp1: &mut [u8], x: u8) -> usize {
+    let len = inp1.len();
+    if len == 0 {
+        return 0;
+    }
+
+    let ptr = inp1.as_mut_ptr();
+    let vlen: usize;
+
+    unsafe {
+        soft_asm!(
+            "vsetvli {vlen}, {len}, e8, m1, ta, ma",
+            "vle8.v v1, ({ptr})",
+            "vmv.v.x v2, {x}",
+            "vadd.vv v1, v1, v2",
+            "vse8.v v1, ({ptr})",
+            len = in(reg) len,
+            ptr = in(reg) ptr,
+            x = in(reg) x,
+            vlen = out(reg) vlen,
+
+            out("v1") _,
+            out("v2") _,
+        );
+    }
+
+    vlen
+}
+
+/*
+pub fn add2(inp1: &mut [u8], x: u8) -> usize {
+    let len = inp1.len();
+    if len == 0 {
+        return 0;
+    }
+
+    let ptr = inp1.as_mut_ptr();
+    let vlen: usize;
+
+    unsafe {
+        soft_asm!(
+            "vsetvli {vlen}, {len}, e8, m1, ta, ma",
+            "vle8.v v1, ({ptr})",
+            "vadd.vx v1, v1, {x}",
+            "vse8.v v1, ({ptr})",
+            len = in(reg) len,
+            ptr = in(reg) ptr,
+            x = in(reg) x,
+            vlen = out(reg) vlen,
+
+            out("v1") _,
+        );
+    }
+
+    vlen
+}
+*/
+
+// Verification ------------------------------------------------------------------------------------
+
+#[test]
+fn test_memset1() {
+    const LEN: usize = 64;
+
+    for fill_value in 0..=2 {
+        for seed in 0..=255 {
+            let mut inp: [u8; LEN] = std::array::from_fn(|i| {
+                (i.wrapping_add(seed as usize)) as u8
+            });
+
+            memset1(&mut inp, fill_value);
+
+            for i in 0..inp.len() {
+                assert_eq!(
+                    inp[i],
+                    fill_value,
+                    "Failed at seed: {}, index: {}",
+                    seed, i
+                );
+            }
+        }
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset1() {
+    const LEN: usize = 1;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset1(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset2() {
+    const LEN: usize = 1;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset2(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[test]
+fn test_add1() {
+    const LEN: usize = 16;
+
+    for add in 0..=255 {
+        for seed in 0..=255 {
+            let mut inp: [u8; LEN] = std::array::from_fn(|i| {
+                (i.wrapping_add(seed as usize)) as u8
+            });
+            let inp_copy = inp;
+
+            let vl = add1(&mut inp, add);
+
+            for i in 0..vl {
+                assert_eq!(
+                    inp[i],
+                    inp_copy[i].wrapping_add(add),
+                    "Failed at seed: {}, index: {}",
+                    seed, i
+                );
+            }
+
+            for i in vl..inp.len() {
+                assert_eq!(
+                    inp[i],
+                    inp_copy[i],
+                    "Failed at seed: {}, index: {}",
+                    seed, i
+                );
+            }
+        }
+    }
+}
+
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_add1() {
+    const LEN: usize = 1;
+    let mut inp: [u8; LEN] = kani::any();
+    let inp_copy: [u8; LEN] = inp;
+    let x: u8 = kani::any();
+
+    let vl: usize = add1(&mut inp, x);
+
+    for i in 0..vl {
+        assert_eq!(inp_copy[i].wrapping_add(x), inp[i]);
+    }
+
+    for i in vl..inp.len() {
+        assert_eq!(inp_copy[i], inp[i]);
+    }
+}
+

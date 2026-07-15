@@ -6,13 +6,12 @@ edition = "2024"
 [target.'cfg(kani_ra)'.dependencies]
 kani = { git = "https://github.com/model-checking/kani" }
 
-[package.metadata.verus]
-verify = true
+# [package.metadata.verus]
+# verify = true
 
 [dependencies]
 softcore-asm-rv64 = "0.3.0"
 softcore-rv64 = "0.6.0"
-vstd = "0.0.0-2026-05-17-0151"
 
 [features]
 userspace = []
