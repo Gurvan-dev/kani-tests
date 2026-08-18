@@ -1,4 +1,4 @@
 [submodule "kani-dev"]
 	path = kani-dev
-	url = git@github.com:CharlyCst/kani-dev.git
+	url = https://github.com/CharlyCst/kani-dev.git
 	branch = charly
