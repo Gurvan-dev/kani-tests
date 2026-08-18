@@ -172,6 +172,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 [[package]]
 name = "softcore-asm-macro"
 version = "0.3.0"
+source = "git+https://github.com/CharlyCst/softcore-asm?branch=vector#d50919f514332d8c4fb177a8ba1242391474956d"
 dependencies = [
  "anyhow",
  "pest",
@@ -186,6 +187,7 @@ dependencies = [
 [[package]]
 name = "softcore-asm-rv64"
 version = "0.3.0"
+source = "git+https://github.com/CharlyCst/softcore-asm?branch=vector#d50919f514332d8c4fb177a8ba1242391474956d"
 dependencies = [
  "softcore-asm-macro",
  "softcore-rv64",
@@ -194,10 +196,12 @@ dependencies = [
 [[package]]
 name = "softcore-prelude"
 version = "0.6.0"
+source = "git+https://github.com/CharlyCst/softcore-rs?branch=vector#a0d8b950f4595b3557ba0e73198e1c854a4385aa"
 
 [[package]]
 name = "softcore-rv64"
 version = "0.6.0"
+source = "git+https://github.com/CharlyCst/softcore-rs?branch=vector#a0d8b950f4595b3557ba0e73198e1c854a4385aa"
 dependencies = [
  "softcore-prelude",
 ]

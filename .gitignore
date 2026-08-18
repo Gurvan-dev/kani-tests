@@ -1,2 +1,4 @@
 target/
 *.smt2
+*.time
+*.log
