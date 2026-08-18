@@ -3,7 +3,7 @@
 set -e
 
 # This is hardcoded for now but could be configured
-PATH="/home/gurvan/git/uni/phd/verif-riscv/kani-dev/scripts:${PATH}"
+# PATH="/home/gurvan/git/uni/phd/verif-riscv/kani-dev/scripts:${PATH}"
 
 # NOTE(Useful kani options):
 # --exact                       Just do the specified harness
@@ -18,7 +18,7 @@ show_help() {
 }
 
 TARGET="${1}"
-KANI_OPT="-Z unstable-options -Z const-prop-prune"
+# KANI_OPT="-Z unstable-options -Z const-prop-prune"
 if [ -n "${2}" ]; then
     KANI_OPT="${KANI_OPT} --harness=${2}"
 fi
