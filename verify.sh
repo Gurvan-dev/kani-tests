@@ -3,7 +3,8 @@
 set -e
 
 BASE_DIR="$(realpath "$(dirname "${0}")")"
-PATH="${BASE_DIR}/kani-dev/scripts:${PATH}"
+KANI_DEV_DIR="${BASE_DIR}/kani-dev"
+PATH="${KANI_DEV_DIR}/scripts:${KANI_DEV_DIR}/target/debug:${KANI_DEV_DIR}/target/debug/deps:${KANI_DEV_DIR}/build/bin:${PATH}"
 
 show_help() {
     echo "Usage: ${0} <target> <harness1> [harness2 ...]"
