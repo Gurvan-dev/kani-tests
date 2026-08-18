@@ -32,6 +32,20 @@ VERIFICATION:- SUCCESSFUL
 Verification Time: 74.19892s
 ```
 
+- minimal_memset1
+
+```
+VERIFICATION:- SUCCESSFUL
+Verification Time: 15.55459s
+```
+
+- minimal_memset2
+
+```
+VERIFICATION:- SUCCESSFUL
+Verification Time: 1.5938704s
+```
+
 - Tests:
 
 ```
@@ -67,6 +81,20 @@ test rv64::test_add1 ... ok
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.70s
 ```
 
+- minimal_memset1
+
+```
+VERIFICATION:- SUCCESSFUL
+Verification Time: 16.64844s
+```
+
+- minimal_memset2
+
+```
+VERIFICATION:- SUCCESSFUL
+Verification Time: 1.5659426s
+```
+
 ## BitStatic Length of 8
 
 - check_add1
@@ -90,4 +118,11 @@ test rv64::test_memset1 ... ok
 test rv64::test_add1 ... ok
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 2.31s
+```
+
+- minimal_memset1
+
+```
+VERIFICATION:- SUCCESSFUL
+Verification Time: 20.72853s
 ```
