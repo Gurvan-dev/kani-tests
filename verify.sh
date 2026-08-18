@@ -19,6 +19,7 @@ fi
 
 TARGET="${1}"
 shift
+KANI_OPT="-Z unstable-options -Z const-prop-prune"
 
 for HARNESS in "$@"; do
     echo "# Running harness '${HARNESS}'"
