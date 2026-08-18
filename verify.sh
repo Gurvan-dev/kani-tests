@@ -25,7 +25,7 @@ fi
 
 case "${TARGET}" in
     check)
-        RUSTFLAGS="--emit mir" cargo kani ${KANI_OPT} --harness=kani_minimal_memset2
+        RUSTFLAGS="--emit mir" cargo kani ${KANI_OPT}
         ;;
 
     smt)

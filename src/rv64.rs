@@ -36,6 +36,7 @@ pub fn memset1(inp: &mut [u8], fill_value: u8) {
             inp = &mut inp[vl..];
             len -= vl;
         }
+        assert!(0 < vl);
     }
 }
 
@@ -143,7 +144,7 @@ fn test_memset1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset1() {
-    const LEN: usize = 1;
+    const LEN: usize = 16;
     let fill_value: u8 = kani::any();
     let mut inp: [u8; LEN] = kani::any();
 
@@ -157,7 +158,7 @@ fn kani_memset1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset2() {
-    const LEN: usize = 1;
+    const LEN: usize = 16;
     let fill_value: u8 = kani::any();
     let mut inp: [u8; LEN] = kani::any();
 
@@ -202,7 +203,6 @@ fn test_add1() {
     }
 }
 
-
 #[cfg(kani)]
 #[kani::proof]
 fn kani_add1() {
@@ -221,4 +221,3 @@ fn kani_add1() {
         assert_eq!(inp_copy[i], inp[i]);
     }
 }
-
