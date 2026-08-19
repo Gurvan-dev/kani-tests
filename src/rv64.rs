@@ -20,6 +20,7 @@ pub fn memset1(inp: &mut [u8], fill_value: u8) {
 
     while 0 < len {
         let vl: usize;
+        /* TODO: Use assembly loop and vsetvli */
         unsafe {
             soft_asm!(
                 "vsetvli {vl}, {len}, e8, m1, ta, ma",
@@ -84,6 +85,35 @@ pub fn add1(inp1: &mut [u8], x: u8) -> usize {
     }
 
     vlen
+}
+
+pub fn xor_cipher(inp: &mut [u8], key: &[u8]) {
+    let mut inp_ptr = inp.as_mut_ptr();
+    let mut inp_len = inp.len();
+    let mut key_idx = 0usize;
+
+    while inp_len > 0 {
+        let vl: usize;
+
+        unsafe {
+            soft_asm!(
+                "vsetvli {vl}, {avl}, e8, m1, ta, ma",
+                "vle8.v v1, ({inp_ptr})",
+                "vxor.vx v1, v1, {key_byte}",
+                "vse8.v v1, ({inp_ptr})",
+
+                vl = out(reg) vl,
+                avl = in(reg) inp_len,
+                inp_ptr = in(reg) inp_ptr,
+                key_byte = in(reg) key[key_idx] as usize,
+                out("v1") _,
+            );
+        }
+
+        inp_ptr = unsafe { inp_ptr.add(vl) };
+        inp_len -= vl;
+        key_idx = (key_idx + vl) % key.len();
+    }
 }
 
 /*
@@ -219,5 +249,22 @@ fn kani_add1() {
 
     for i in vl..inp.len() {
         assert_eq!(inp_copy[i], inp[i]);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_xor_cipher() {
+    const INP_LEN: usize = 64;
+    const KEY_LEN: usize = 64;
+    let mut inp: [u8; INP_LEN] = kani::any();
+    let mut key: [u8; KEY_LEN] = kani::any();
+    /* TODO: We would like to verify any input size up to INP_LEN and KEY_LEN */
+    let mut inp_old = inp;
+    xor_cipher(&mut inp, &key);
+
+    for i in 0..INP_LEN {
+        let key_idx = i % KEY_LEN;
+        assert_eq!(inp[i], inp_old[i] ^ key[key_idx]);
     }
 }

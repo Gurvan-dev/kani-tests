@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "aho-corasick"
-version = "1.1.4"
+version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ddd31a130427c27518df266943a5308ed92d4b226cc639f5a8f1002816174301"
+checksum = "c982642fa9e8606056828ee9a8505737230110bb1099153c79efe865c59d12ba"
 dependencies = [
  "memchr",
 ]
@@ -26,7 +26,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "kani"
 version = "0.67.0"
-source = "git+https://github.com/model-checking/kani#208bb5e4e526cddf64a99ca34bca90f83b424eb5"
+source = "git+https://github.com/model-checking/kani#d1994143456cf44168f35ad56e4000b1072f0125"
 dependencies = [
  "kani_core",
  "kani_macros",
@@ -35,7 +35,7 @@ dependencies = [
 [[package]]
 name = "kani_core"
 version = "0.67.0"
-source = "git+https://github.com/model-checking/kani#208bb5e4e526cddf64a99ca34bca90f83b424eb5"
+source = "git+https://github.com/model-checking/kani#d1994143456cf44168f35ad56e4000b1072f0125"
 dependencies = [
  "kani_macros",
 ]
@@ -43,7 +43,7 @@ dependencies = [
 [[package]]
 name = "kani_macros"
 version = "0.67.0"
-source = "git+https://github.com/model-checking/kani#208bb5e4e526cddf64a99ca34bca90f83b424eb5"
+source = "git+https://github.com/model-checking/kani#d1994143456cf44168f35ad56e4000b1072f0125"
 dependencies = [
  "proc-macro2",
  "proc-macro2-diagnostics",
@@ -70,9 +70,9 @@ dependencies = [
 
 [[package]]
 name = "pest"
-version = "2.8.7"
+version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47627dd7305c6a2d6c8c6bcd24c5a4c17dbbf425f4f9c5313e724b38fc9782e9"
+checksum = "5a07a60cc7a4d00c91f95c685609d1d2f79050e6804b70ebedd7650f0b839bcf"
 dependencies = [
  "memchr",
  "ucd-trie",
@@ -80,9 +80,9 @@ dependencies = [
 
 [[package]]
 name = "pest_derive"
-version = "2.8.7"
+version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b4254325ecad416ab689e27ba51da03ba01a9632bc6e108f5fe7c3c4ad29d58"
+checksum = "b3a83744a5c8455b8b3e0dc5031362780a347c878bdd11584d1a8984228cc88d"
 dependencies = [
  "pest",
  "pest_generator",
@@ -90,9 +90,9 @@ dependencies = [
 
 [[package]]
 name = "pest_generator"
-version = "2.8.7"
+version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c4c0e91ead7a8f7acecbca6f003fc2e8282b1dbe2dd9c9d2f16aba42995e0a7"
+checksum = "e0cd3451aa3de60d4b9a1e736885e4dea6b31617598026f12256ad566d63304a"
 dependencies = [
  "pest",
  "pest_meta",
@@ -103,18 +103,18 @@ dependencies = [
 
 [[package]]
 name = "pest_meta"
-version = "2.8.7"
+version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9744bc48116fee06334924bb5f2bad41eed5e89bd26e29b0b799f9a3f82c210"
+checksum = "e04d3a0849e241d7dfce834c83b1c5edc8622009e8dd51a12ba1927c32f05496"
 dependencies = [
  "pest",
 ]
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.106"
+version = "1.0.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fd00f0bb2e90d81d1044c2b32617f68fcb9fa3bb7640c23e9c748e53fb30934"
+checksum = "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
 dependencies = [
  "unicode-ident",
 ]
@@ -133,18 +133,18 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.46"
+version = "1.0.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfbc457d0c7a0759a614551b11a6409e5951f6c7537be1f1b7682b9ae9230368"
+checksum = "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001"
 dependencies = [
  "proc-macro2",
 ]
 
 [[package]]
 name = "regex"
-version = "1.13.0"
+version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a0e75113e14dc5acb068cd0786884f214f1312650a3d36d269f5c4f3cdee8a2"
+checksum = "f020237b6c8eed93db2e2cb53c00c60a8e1bc73da7d073199a1180401450218d"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -154,9 +154,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.4.15"
+version = "0.4.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f388202e4b80542a0921078cc23b6333bcf1409c1e3f86404cae4766a6131db"
+checksum = "ad8553b9b26413251cbf30e620595c7a41b3887f03da04579c0e6b0d6a06b4b2"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -172,7 +172,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 [[package]]
 name = "softcore-asm-macro"
 version = "0.3.0"
-source = "git+https://github.com/CharlyCst/softcore-asm?branch=vector#d50919f514332d8c4fb177a8ba1242391474956d"
+source = "git+https://github.com/CharlyCst/softcore-asm?branch=vector#abd54f5b6aae35eea9b7c7207238bbe6526066df"
 dependencies = [
  "anyhow",
  "pest",
@@ -187,7 +187,7 @@ dependencies = [
 [[package]]
 name = "softcore-asm-rv64"
 version = "0.3.0"
-source = "git+https://github.com/CharlyCst/softcore-asm?branch=vector#d50919f514332d8c4fb177a8ba1242391474956d"
+source = "git+https://github.com/CharlyCst/softcore-asm?branch=vector#abd54f5b6aae35eea9b7c7207238bbe6526066df"
 dependencies = [
  "softcore-asm-macro",
  "softcore-rv64",
@@ -196,12 +196,12 @@ dependencies = [
 [[package]]
 name = "softcore-prelude"
 version = "0.6.0"
-source = "git+https://github.com/CharlyCst/softcore-rs?branch=vector#a0d8b950f4595b3557ba0e73198e1c854a4385aa"
+source = "git+https://github.com/CharlyCst/softcore-rs?branch=vector#a100bebe51b6d344cf7ed2cde2b8361479ba9936"
 
 [[package]]
 name = "softcore-rv64"
 version = "0.6.0"
-source = "git+https://github.com/CharlyCst/softcore-rs?branch=vector#a0d8b950f4595b3557ba0e73198e1c854a4385aa"
+source = "git+https://github.com/CharlyCst/softcore-rs?branch=vector#a100bebe51b6d344cf7ed2cde2b8361479ba9936"
 dependencies = [
  "softcore-prelude",
 ]
