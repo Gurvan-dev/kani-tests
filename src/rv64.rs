@@ -87,34 +87,30 @@ pub fn add1(inp1: &mut [u8], x: u8) -> usize {
     vlen
 }
 
-/*
-pub fn add2(inp1: &mut [u8], x: u8) -> usize {
-    let len = inp1.len();
-    if len == 0 {
-        return 0;
+pub fn add_full(inp: &mut [u8], x: u8) {
+    let mut inp_len = inp.len();
+    let mut inp_ptr = inp.as_mut_ptr();
+
+    while 0 < inp_len {
+        let vlen: usize;
+        unsafe {
+            soft_asm!(
+                "vsetvli {vlen}, {inp_len}, e8, m1, ta, ma",
+                "vle8.v v1, ({inp_ptr})",
+                "vadd.vx v1, v1, {x}",
+                "vse8.v v1, ({inp_ptr})",
+                inp_len = in(reg) inp_len,
+                inp_ptr = in(reg) inp_ptr,
+                x = in(reg) x,
+                vlen = out(reg) vlen,
+
+                out("v1") _,
+            );
+        }
+        inp_ptr = unsafe { inp_ptr.add(vlen) };
+        inp_len -= vlen;
     }
-
-    let ptr = inp1.as_mut_ptr();
-    let vlen: usize;
-
-    unsafe {
-        soft_asm!(
-            "vsetvli {vlen}, {len}, e8, m1, ta, ma",
-            "vle8.v v1, ({ptr})",
-            "vadd.vx v1, v1, {x}",
-            "vse8.v v1, ({ptr})",
-            len = in(reg) len,
-            ptr = in(reg) ptr,
-            x = in(reg) x,
-            vlen = out(reg) vlen,
-
-            out("v1") _,
-        );
-    }
-
-    vlen
 }
-*/
 
 // Verification ------------------------------------------------------------------------------------
 
@@ -220,6 +216,20 @@ fn kani_add1() {
 
     for i in vl..inp.len() {
         assert_eq!(inp_copy[i], inp[i]);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_add_full() {
+    const LEN: usize = 4;
+    let mut inp: [u8; LEN] = kani::any();
+    let x: u8 = kani::any();
+    let inp_old = inp;
+    add_full(&mut inp, x);
+
+    for i in 0..LEN {
+        assert_eq!(inp_old[i].wrapping_add(x), inp[i]);
     }
 }
 
