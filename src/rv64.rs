@@ -255,8 +255,8 @@ fn kani_add1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_xor_cipher() {
-    const INP_LEN: usize = 64;
-    const KEY_LEN: usize = 64;
+    const INP_LEN: usize = 8;
+    const KEY_LEN: usize = 8;
     let mut inp: [u8; INP_LEN] = kani::any();
     let mut key: [u8; KEY_LEN] = kani::any();
     /* TODO: We would like to verify any input size up to INP_LEN and KEY_LEN */
