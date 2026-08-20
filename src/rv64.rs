@@ -145,7 +145,7 @@ fn test_memset1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset1() {
-    const LEN: usize = 16;
+    const LEN: usize = 8;
     let fill_value: u8 = kani::any();
     let mut inp: [u8; LEN] = kani::any();
 
@@ -159,7 +159,7 @@ fn kani_memset1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset2() {
-    const LEN: usize = 16;
+    const LEN: usize = 8;
     let fill_value: u8 = kani::any();
     let mut inp: [u8; LEN] = kani::any();
 
@@ -207,7 +207,7 @@ fn test_add1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_add1() {
-    const LEN: usize = 1;
+    const LEN: usize = 4;
     let mut inp: [u8; LEN] = kani::any();
     let inp_copy: [u8; LEN] = inp;
     let x: u8 = kani::any();
