@@ -90,7 +90,7 @@ pub fn memset5(inp: &mut [u8], fill_value: u8) {
 }
 
 pub fn memset6(inp: &mut [u8], fill_value: u8) {
-    for i  in 0..inp.len() {
+    for i in 0..inp.len() {
         unsafe {
             soft_asm!(
                 "sb {fill_value} ({ptr})",
@@ -209,7 +209,7 @@ fn test_memset1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset1() {
-    const LEN: usize = 8;
+    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
     let mut inp: [u8; LEN] = kani::any();
 
@@ -223,7 +223,7 @@ fn kani_memset1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset2() {
-    const LEN: usize = 8;
+    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
     let mut inp: [u8; LEN] = kani::any();
 
