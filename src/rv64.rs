@@ -57,6 +57,23 @@ pub fn memset2(inp: &mut [u8], fill_value: u8) {
     }
 }
 
+pub fn memset3(inp: &mut [u8], fill_value: u8) {
+    let mut len = inp.len();
+    let mut inp: &mut [u8] = inp;
+
+    while 0 < len {
+        inp[0] = fill_value;
+        inp = &mut inp[1..];
+        len -= 1;
+    }
+}
+
+pub fn memset4(inp: &mut [u8], fill_value: u8) {
+    for i in 0..inp.len() {
+        inp[i] = fill_value;
+    }
+}
+
 pub fn memset_broken(inp: &mut [u8], fill_value: u8) {
     let mut len = inp.len();
     let mut inp: &mut [u8] = inp;
@@ -189,6 +206,35 @@ fn kani_memset2() {
         assert_eq!(inp[i], fill_value);
     }
 }
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset3() {
+    const LEN: usize = 64;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset3(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset4() {
+    const LEN: usize = 64;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset4(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
 
 #[cfg(kani)]
 #[kani::proof]
