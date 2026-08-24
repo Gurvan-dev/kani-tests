@@ -1,6 +1,21 @@
-cargo kani --output-format terse --harness check_vec_add_second_partial
+# Verification of RISC-V Vector inline assembly in Rust
 
 ```
 git submodule update --init --recursive
 cd kani-dev && cargo build-dev
 ```
+
+# Benchmarks
+
+Current:
+
+| Benchmark                             | Time (s)  | Time (min)    | Time (hours)  |
+|---------------------------------------|-----------|---------------|---------------|
+| memset1 (len=16)                      | 2105.44   | 35            | 0.58          |
+| memset1 (len=8)                       | 1282.98   | 21.38         | 0.35          |
+| memset2 (len=16)                      | 190.47    | 3.17          | -             |
+| memset2 (len=8)                       | 169.58    | 2.82          | -             |
+| add1 (len=4)                          | 939.68    | 15.66         | 0.26          |
+| add1 (len=1)                          | 921.48    | 15.52         | 0.25          |
+| add_full (len=4)                      | 1196.38s  | 19.93         | 0.33          |
+| xor_cipher (inp_len=64, key_len=64)   | 13403.12  | 223.38        | 3.723         |
