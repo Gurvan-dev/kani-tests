@@ -101,6 +101,30 @@ pub fn memset6(inp: &mut [u8], fill_value: u8) {
     }
 }
 
+pub fn memset7(inp: &mut [u8], fill_value: u8) {
+    let mut i = 0usize;
+
+    while i < inp.len() {
+        let vl: usize;
+        unsafe {
+            soft_asm!(
+                "vsetvli {vl}, {len}, e8, m1, ta, ma",
+                "vmv.v.x v0, {fill}",
+                "vse8.v v0, ({ptr})",
+
+                vl = out(reg) vl,
+                fill = in(reg) fill_value,
+                len = in(reg) len,
+                ptr = in(reg) inp[i..].as_ptr(),
+                out("v0") _,
+                out("v8") _
+            );
+        }
+        i += vl;
+        assert!(0 < vl);
+    }
+}
+
 pub fn memset_broken(inp: &mut [u8], fill_value: u8) {
     let mut len = inp.len();
     let mut inp: &mut [u8] = inp;
@@ -284,6 +308,20 @@ fn kani_memset6() {
     let mut inp: [u8; LEN] = kani::any();
 
     memset6(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset7() {
+    const LEN: usize = 64;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset7(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);
