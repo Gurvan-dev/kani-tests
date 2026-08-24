@@ -75,11 +75,9 @@ pub fn memset4(inp: &mut [u8], fill_value: u8) {
 }
 
 pub fn memset5(inp: &mut [u8], fill_value: u8) {
-    let mut len = inp.len();
-    let mut inp: &mut [u8] = inp;
     let mut i = 0usize;
 
-    while i < len {
+    while i < inp.len() {
         unsafe {
             soft_asm!(
                 "sb {fill_value} ({ptr})",
@@ -87,6 +85,18 @@ pub fn memset5(inp: &mut [u8], fill_value: u8) {
                 ptr = in(reg) inp[i..].as_ptr(),
             );
             i += 1;
+        }
+    }
+}
+
+pub fn memset6(inp: &mut [u8], fill_value: u8) {
+    for i  in 0..inp.len() {
+        unsafe {
+            soft_asm!(
+                "sb {fill_value} ({ptr})",
+                fill_value = in(reg) fill_value,
+                ptr = in(reg) inp[i..].as_ptr(),
+            );
         }
     }
 }
@@ -260,6 +270,20 @@ fn kani_memset5() {
     let mut inp: [u8; LEN] = kani::any();
 
     memset5(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset6() {
+    const LEN: usize = 64;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset6(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);
