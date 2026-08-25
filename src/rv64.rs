@@ -106,6 +106,7 @@ pub fn memset7(inp: &mut [u8], fill_value: u8) {
 
     while i < inp.len() {
         let vl: usize;
+        let inp2 = &mut inp[i..];
         unsafe {
             soft_asm!(
                 "vsetvli {vl}, {len}, e8, m1, ta, ma",
@@ -114,8 +115,8 @@ pub fn memset7(inp: &mut [u8], fill_value: u8) {
 
                 vl = out(reg) vl,
                 fill = in(reg) fill_value,
-                len = in(reg) len,
-                ptr = in(reg) inp[i..].as_ptr(),
+                len = in(reg) inp2.len(),
+                ptr = in(reg) inp2.as_ptr(),
                 out("v0") _,
                 out("v8") _
             );
@@ -127,7 +128,7 @@ pub fn memset7(inp: &mut [u8], fill_value: u8) {
 
 pub fn memset_broken(inp: &mut [u8], fill_value: u8) {
     let mut len = inp.len();
-    let mut inp: &mut [u8] = inp;
+    let inp: &mut [u8] = inp;
 
     while 0 < len {
         let vl: usize;
@@ -444,8 +445,8 @@ fn kani_xor_cipher() {
     const INP_LEN: usize = 64;
     const KEY_LEN: usize = 64;
     let mut inp: [u8; INP_LEN] = kani::any();
-    let mut key: [u8; KEY_LEN] = kani::any();
-    let mut inp_old = inp;
+    let key: [u8; KEY_LEN] = kani::any();
+    let inp_old = inp;
     xor_cipher(&mut inp, &key);
 
     for i in 0..INP_LEN {
