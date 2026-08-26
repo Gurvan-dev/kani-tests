@@ -365,12 +365,13 @@ fn test_memset1() {
     }
 }
 
+const MEMSET_KANI_LEN: usize = 32;
+
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset1() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset1(&mut inp, fill_value);
 
@@ -382,9 +383,8 @@ fn kani_memset1() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset2() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset2(&mut inp, fill_value);
 
@@ -396,9 +396,8 @@ fn kani_memset2() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset3() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset3(&mut inp, fill_value);
 
@@ -410,9 +409,8 @@ fn kani_memset3() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset4() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset4(&mut inp, fill_value);
 
@@ -424,9 +422,8 @@ fn kani_memset4() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset5() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset5(&mut inp, fill_value);
 
@@ -438,9 +435,8 @@ fn kani_memset5() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset6() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset6(&mut inp, fill_value);
 
@@ -452,9 +448,8 @@ fn kani_memset6() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset7() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset7(&mut inp, fill_value);
 
@@ -466,9 +461,8 @@ fn kani_memset7() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset8() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset8(&mut inp, fill_value);
 
@@ -480,9 +474,8 @@ fn kani_memset8() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset9() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset9(&mut inp, fill_value);
 
@@ -494,9 +487,8 @@ fn kani_memset9() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset10() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset10(&mut inp, fill_value);
 
@@ -508,9 +500,8 @@ fn kani_memset10() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset11() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset10(&mut inp, fill_value);
 
@@ -522,9 +513,8 @@ fn kani_memset11() {
 #[cfg(kani)]
 #[kani::proof]
 fn kani_memset12() {
-    const LEN: usize = 64;
     let fill_value: u8 = kani::any();
-    let mut inp: [u8; LEN] = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset12(&mut inp, fill_value);
 
