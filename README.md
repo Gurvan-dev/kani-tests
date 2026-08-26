@@ -26,6 +26,7 @@ Current:
 | memset8 (len=64)                      | 1.47      | 0         | 0         |
 | memset9 (len=64)                      | 254.37    |           |           |
 | memset10 (len=64)                     | 252.59    |           |           |
+| memset11 (len=64)                     | 258.32    |           |           |
 | memset_broken (len=8)                 | 1290.93   | 21.5      | 0.35      |
 | add1 (len=4)                          | 939.68    | 15.66     | 0.26      |
 | add1 (len=1)                          | 921.48    | 15.52     | 0.25      |

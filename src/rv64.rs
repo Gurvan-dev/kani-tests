@@ -231,6 +231,35 @@ pub fn memset11(inp: &mut [u8], fill_value: u8) {
     }
 }
 
+/* memset8, but we get the pointer outside of the loop and do not use it */
+pub fn memset12(inp: &mut [u8], fill_value: u8) {
+    unsafe {
+                    let mut core = self::_get_softcore_ptr();
+                }
+    for i in 0..inp.len() {
+        let inp_ptr = inp[i..].as_ptr();
+        unsafe {
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::softcore_rv64::{
+                    Core, Trap, ast, prelude::bv, registers as reg,
+                    raw::{iop, rop, sop, csrop, csr_name_map_backwards, self},
+                };
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::{FromRegister, handle_trap};
+                unsafe {
+                    #![allow(unused_assignment, unused_variables, unused)]
+                    #![allow(unreachable_code)]
+                    let addr = core::ptr::with_exposed_provenance_mut::<
+                        u8,
+                    >(0usize.wrapping_add(inp_ptr as usize) as usize);
+                    core::ptr::write(addr, fill_value);
+                }
+        }
+    }
+}
+
+/* TODO: Use bitvector casts for address and value */
+
 pub fn memset_broken(inp: &mut [u8], fill_value: u8) {
     let mut len = inp.len();
     let inp: &mut [u8] = inp;
@@ -484,6 +513,20 @@ fn kani_memset11() {
     let mut inp: [u8; LEN] = kani::any();
 
     memset10(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset12() {
+    const LEN: usize = 64;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset12(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);
