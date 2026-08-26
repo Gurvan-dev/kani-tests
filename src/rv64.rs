@@ -153,6 +153,7 @@ pub fn memset8(inp: &mut [u8], fill_value: u8) {
 /* memset6 but we use the core only for the value and not the address */
 pub fn memset9(inp: &mut [u8], fill_value: u8) {
     for i in 0..inp.len() {
+        let inp_ptr = inp[i..].as_ptr();
         unsafe {
             {
                 #[allow(unused_imports)]
@@ -170,7 +171,7 @@ pub fn memset9(inp: &mut [u8], fill_value: u8) {
                     let val = (*core).get(reg::X1);
                     let addr = core::ptr::with_exposed_provenance_mut::<
                         u8,
-                    >(0u64.wrapping_add((*core).get(reg::X2)) as usize);
+                    >(0usize.wrapping_add(inp_ptr as usize) as usize);
                     core::ptr::write(addr, val as u8);
                 }
             };
