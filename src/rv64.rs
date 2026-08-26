@@ -143,7 +143,7 @@ pub fn memset8(inp: &mut [u8], fill_value: u8) {
                     #![allow(unreachable_code)]
                     let addr = core::ptr::with_exposed_provenance_mut::<
                         u8,
-                    >(0u64.wrapping_add(inp_ptr) as usize);
+                    >(0usize.wrapping_add(inp_ptr as usize) as usize);
                     core::ptr::write(addr, fill_value);
                 }
         }
