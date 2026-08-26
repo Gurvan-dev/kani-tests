@@ -150,6 +150,61 @@ pub fn memset8(inp: &mut [u8], fill_value: u8) {
     }
 }
 
+/* memset6 but we use the core only for the value and not the address */
+pub fn memset9(inp: &mut [u8], fill_value: u8) {
+    for i in 0..inp.len() {
+        unsafe {
+            {
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::softcore_rv64::{
+                    Core, Trap, ast, prelude::bv, registers as reg,
+                    raw::{iop, rop, sop, csrop, csr_name_map_backwards, self},
+                };
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::{FromRegister, handle_trap};
+                unsafe {
+                    #![allow(unused_assignment, unused_variables, unused)]
+                    #![allow(unreachable_code)]
+                    let mut core = self::_get_softcore_ptr();
+                    (*core).set(reg::X1, fill_value as u64);
+                    let val = (*core).get(reg::X1);
+                    let addr = core::ptr::with_exposed_provenance_mut::<
+                        u8,
+                    >(0u64.wrapping_add((*core).get(reg::X2)) as usize);
+                    core::ptr::write(addr, val as u8);
+                }
+            };
+        }
+    }
+}
+
+/* memset6 but we use the core only for the address and not the value */
+pub fn memset10(inp: &mut [u8], fill_value: u8) {
+    for i in 0..inp.len() {
+        unsafe {
+            {
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::softcore_rv64::{
+                    Core, Trap, ast, prelude::bv, registers as reg,
+                    raw::{iop, rop, sop, csrop, csr_name_map_backwards, self},
+                };
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::{FromRegister, handle_trap};
+                unsafe {
+                    #![allow(unused_assignment, unused_variables, unused)]
+                    #![allow(unreachable_code)]
+                    let mut core = self::_get_softcore_ptr();
+                    (*core).set(reg::X2, inp[i..].as_ptr() as u64);
+                    let addr = core::ptr::with_exposed_provenance_mut::<
+                        u8,
+                    >(0u64.wrapping_add((*core).get(reg::X2)) as usize);
+                    core::ptr::write(addr, fill_value as u8);
+                }
+            };
+        }
+    }
+}
+
 pub fn memset_broken(inp: &mut [u8], fill_value: u8) {
     let mut len = inp.len();
     let inp: &mut [u8] = inp;
@@ -361,6 +416,34 @@ fn kani_memset8() {
     let mut inp: [u8; LEN] = kani::any();
 
     memset8(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset9() {
+    const LEN: usize = 64;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset9(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset10() {
+    const LEN: usize = 64;
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; LEN] = kani::any();
+
+    memset10(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);
