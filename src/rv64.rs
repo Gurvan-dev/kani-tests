@@ -258,6 +258,237 @@ pub fn memset12(inp: &mut [u8], fill_value: u8) {
     }
 }
 
+
+/* memset1, but expanded */
+    pub fn memset13(inp: &mut [u8], fill_value: u8) {
+        let mut len = inp.len();
+        let mut inp: &mut [u8] = inp;
+        while 0 < len {
+            let vl: usize;
+            unsafe {
+                {
+                    #[allow(unused_imports)]
+                    use ::softcore_asm_rv64::softcore_rv64::{
+                        Core, Trap, ast, prelude::bv, registers as reg,
+                        raw::{iop, rop, sop, csrop, csr_name_map_backwards, self},
+                    };
+                    #[allow(unused_imports)]
+                    use ::softcore_asm_rv64::{FromRegister, handle_trap};
+                    unsafe {
+                        #![allow(unused_assignment, unused_variables, unused)]
+                        #![allow(unreachable_code)]
+                        let mut core = self::_get_softcore_ptr();
+                        (*core).set(reg::X2, fill_value as u64);
+                        (*core).set(reg::X3, len as u64);
+                        (*core).set(reg::X4, inp.as_ptr() as u64);
+                        if let Trap::Some(_) = (*core)
+                            .execute(
+                                ast::VSETVLI((
+                                    bv(1u64),
+                                    bv(1u64),
+                                    bv(0u64),
+                                    bv(0u64),
+                                    reg::X3,
+                                    reg::X1,
+                                )),
+                            )
+                        {
+                            {
+                                panic!(
+                                        "Assembly trapped, but not trap handled was provided to softcore"
+                                );
+                            };
+                        }
+                        if let Trap::Some(_) = (*core)
+                            .execute(ast::MOVETYPEX((reg::X2, reg::V0)))
+                        {
+                            {
+                                panic!(
+                                        "Assembly trapped, but not trap handled was provided to softcore"
+                                );
+                            };
+                        }
+                        let base_addr = 0u64.wrapping_add((*core).get(reg::X4)) as usize;
+                        let elements = (*core).get_vec(reg::V0);
+                        for i in 0..elements.len() {
+                            let v = &elements[i];
+                            let addr = core::ptr::with_exposed_provenance_mut::<
+                                u8,
+                            >(base_addr.wrapping_add(i));
+                            let val = v.to_raw_le()[0];
+                            core::ptr::write(addr, val);
+                        }
+                        (vl,) = ((*core).get(reg::X1) as _,);
+                    }
+                };
+                inp = &mut inp[vl..];
+                len -= vl;
+            }
+            assert!(0 < vl);
+        }
+    }
+
+/* memset1 but remove trap handler */
+pub fn memset14(inp: &mut [u8], fill_value: u8) {
+    let mut len = inp.len();
+    let mut inp: &mut [u8] = inp;
+    while 0 < len {
+        let vl: usize;
+        unsafe {
+            {
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::softcore_rv64::{
+                    Core, Trap, ast, prelude::bv, registers as reg,
+                    raw::{iop, rop, sop, csrop, csr_name_map_backwards, self},
+                };
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::{FromRegister, handle_trap};
+                unsafe {
+                    #![allow(unused_assignment, unused_variables, unused)]
+                    #![allow(unreachable_code)]
+                    let mut core = self::_get_softcore_ptr();
+                    (*core).set(reg::X2, fill_value as u64);
+                    (*core).set(reg::X3, len as u64);
+                    (*core).set(reg::X4, inp.as_ptr() as u64);
+                    (*core)
+                        .execute(
+                            ast::VSETVLI((
+                                bv(1u64),
+                                bv(1u64),
+                                bv(0u64),
+                                bv(0u64),
+                                reg::X3,
+                                reg::X1,
+                            )),
+                        );
+
+                    (*core).execute(ast::MOVETYPEX((reg::X2, reg::V0)));
+                    let base_addr = 0u64.wrapping_add((*core).get(reg::X4)) as usize;
+                    let elements = (*core).get_vec(reg::V0);
+                    for i in 0..elements.len() {
+                        let v = &elements[i];
+                        let addr = core::ptr::with_exposed_provenance_mut::<
+                            u8,
+                        >(base_addr.wrapping_add(i));
+                        let val = v.to_raw_le()[0];
+                        core::ptr::write(addr, val);
+                    }
+                    (vl,) = ((*core).get(reg::X1) as _,);
+                }
+            };
+            inp = &mut inp[vl..];
+            len -= vl;
+        }
+        assert!(0 < vl);
+        }
+}
+
+/* memset14 but we only get the core pointer once */
+pub fn memset15(inp: &mut [u8], fill_value: u8) {
+    let mut len = inp.len();
+    let mut inp: &mut [u8] = inp;
+    let mut core = unsafe { self::_get_softcore_ptr() };
+    while 0 < len {
+        let vl: usize;
+        unsafe {
+            {
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::softcore_rv64::{
+                    Core, Trap, ast, prelude::bv, registers as reg,
+                    raw::{iop, rop, sop, csrop, csr_name_map_backwards, self},
+                };
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::{FromRegister, handle_trap};
+                unsafe {
+                    #![allow(unused_assignment, unused_variables, unused)]
+                    #![allow(unreachable_code)]
+                    (*core).set(reg::X2, fill_value as u64);
+                    (*core).set(reg::X3, len as u64);
+                    (*core).set(reg::X4, inp.as_ptr() as u64);
+                    (*core).execute(
+                        ast::VSETVLI((
+                                bv(1u64),
+                                bv(1u64),
+                                bv(0u64),
+                                bv(0u64),
+                                reg::X3,
+                                reg::X1,
+                            )),
+                        );
+                    (*core).execute(ast::MOVETYPEX((reg::X2, reg::V0)));
+                    let base_addr = 0u64.wrapping_add((*core).get(reg::X4)) as usize;
+                    let elements = (*core).get_vec(reg::V0);
+                    for i in 0..elements.len() {
+                        let v = &elements[i];
+                        let addr = core::ptr::with_exposed_provenance_mut::<
+                            u8,
+                        >(base_addr.wrapping_add(i));
+                        let val = v.to_raw_le()[0];
+                        core::ptr::write(addr, val);
+                    }
+                    (vl,) = ((*core).get(reg::X1) as _,);
+                }
+            };
+            inp = &mut inp[vl..];
+            len -= vl;
+        }
+        assert!(0 < vl);
+        }
+}
+
+/* memset15 but we don't use a register for the address */
+pub fn memset16(inp: &mut [u8], fill_value: u8) {
+    let mut len = inp.len();
+    let mut inp: &mut [u8] = inp;
+    let mut core = unsafe { self::_get_softcore_ptr() };
+    while 0 < len {
+        let vl: usize;
+        unsafe {
+            {
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::softcore_rv64::{
+                    Core, Trap, ast, prelude::bv, registers as reg,
+                    raw::{iop, rop, sop, csrop, csr_name_map_backwards, self},
+                };
+                #[allow(unused_imports)]
+                use ::softcore_asm_rv64::{FromRegister, handle_trap};
+                unsafe {
+                    #![allow(unused_assignment, unused_variables, unused)]
+                    #![allow(unreachable_code)]
+                    (*core).set(reg::X2, fill_value as u64);
+                    (*core).set(reg::X3, len as u64);
+                    (*core).set(reg::X4, inp.as_ptr() as u64);
+                    (*core).execute(
+                        ast::VSETVLI((
+                                bv(1u64),
+                                bv(1u64),
+                                bv(0u64),
+                                bv(0u64),
+                                reg::X3,
+                                reg::X1,
+                            )),
+                        );
+                    (*core).execute(ast::MOVETYPEX((reg::X2, reg::V0)));
+                    let base_addr = inp.as_ptr() as usize;
+                    let elements = (*core).get_vec(reg::V0);
+                    for i in 0..elements.len() {
+                        let v = &elements[i];
+                        let addr = core::ptr::with_exposed_provenance_mut::<
+                            u8,
+                        >(base_addr.wrapping_add(i));
+                        let val = v.to_raw_le()[0];
+                        core::ptr::write(addr, val);
+                    }
+                    (vl,) = ((*core).get(reg::X1) as _,);
+                }
+            };
+            inp = &mut inp[vl..];
+            len -= vl;
+        }
+        assert!(0 < vl);
+        }
+}
+
 /* TODO: Use bitvector casts for address and value */
 
 pub fn memset_broken(inp: &mut [u8], fill_value: u8) {
@@ -517,6 +748,58 @@ fn kani_memset12() {
     let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset12(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset13() {
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
+
+    memset13(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset14() {
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
+
+    memset14(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset15() {
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
+
+    memset15(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset16() {
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
+
+    memset16(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);
