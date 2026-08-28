@@ -7,7 +7,8 @@ cd kani-dev && cargo build-dev
 
 # Benchmarks
 
-Current:
+TODO: Give a small note for each memset about its specific implementation
+details
 
 | Benchmark                             | Time (s)  | Time (m)  | Time (h)  |
 |---------------------------------------|-----------|-----------|-----------|
@@ -22,6 +23,11 @@ Current:
 | memset10 (len=32)                     | 194.26    |           |           |
 | memset11 (len=32)                     | 192.90    |           |           |
 | memset12 (len=32)                     | 106.91    |           |           |
+| memset13 (len=32)                     | 3584.53   |           |           |
+| memset14 (len=32)                     | 3573.991  |           |           |
+| memset15 (len=32)                     | 3496.30   |           |           |
+| memset16 (len=32)                     | 3458.78   |           |           |
+| memset17 (len=32)                     |           |           |           |
 |---------------------------------------|-----------|-----------|-----------|
 | memset1 (len=64)                      | 7425.88s  | 123.76    | 2.06      |
 | memset3 (len=64)                      | 1.21      | 0         | 0         |

@@ -35,9 +35,9 @@ static mut V1: BitDynamic = BitDynamic::zeros(VECTOR_REG_SIZE);
 static mut V2: BitDynamic = BitDynamic::zeros(VECTOR_REG_SIZE);
 static mut V3: BitDynamic = BitDynamic::zeros(VECTOR_REG_SIZE);
 
-static mut X1: BitStatic::<REG_SIZE> = BitStatic::zeros();
-static mut X2: BitStatic::<REG_SIZE> = BitStatic::zeros();
-static mut X3: BitStatic::<REG_SIZE> = BitStatic::zeros();
+static mut X1: BitStatic<REG_SIZE> = BitStatic::zeros();
+static mut X2: BitStatic<REG_SIZE> = BitStatic::zeros();
+static mut X3: BitStatic<REG_SIZE> = BitStatic::zeros();
 
 /* Utils */
 
@@ -65,7 +65,7 @@ pub fn rv(reg: RegIdxVec) -> BitDynamic {
     }
 }
 
-pub fn rx(reg: RegIdx) -> BitStatic::<REG_SIZE> {
+pub fn rx(reg: RegIdx) -> BitStatic<REG_SIZE> {
     match reg {
         RegIdx::X0 => BitStatic::zeros(),
         RegIdx::X1 => unsafe { X1 },
@@ -84,7 +84,7 @@ pub fn wv(reg: RegIdxVec, v: BitDynamic) {
     }
 }
 
-pub fn wx(reg: RegIdx, v: BitStatic::<REG_SIZE>) {
+pub fn wx(reg: RegIdx, v: BitStatic<REG_SIZE>) {
     match reg {
         RegIdx::X0 => (),
         RegIdx::X1 => unsafe { X1 = v },
@@ -181,7 +181,9 @@ pub fn vstore8(addr: RegIdx, regidx: RegIdxVec) {
     let addr = rx(addr).unsigned() as usize;
     for i in 0..vl {
         let addr = core::ptr::with_exposed_provenance_mut::<u8>(addr.wrapping_add(i * sew));
-        let value = reg_val.get_subrange(((i + 1) * 8 * sew) as i128, (i * 8 * sew) as i128).to_raw_le()[0];
+        let value = reg_val
+            .get_subrange(((i + 1) * 8 * sew) as i128, (i * 8 * sew) as i128)
+            .to_raw_le()[0];
         unsafe {
             *addr = value;
         }
@@ -225,10 +227,13 @@ fn kani_minimal_memset() {
     memset(&mut inp, fill_value);
 
     for i in 0..inp.len() {
-        assert_eq!(inp[i], fill_value, "{} != {} at indice {}", inp[i], fill_value, i);
+        assert_eq!(
+            inp[i], fill_value,
+            "{} != {} at indice {}",
+            inp[i], fill_value, i
+        );
     }
 }
-
 
 #[cfg(kani)]
 #[kani::proof]
