@@ -970,7 +970,7 @@ fn kani_memset19() {
     let fill_value: u8 = kani::any();
     let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
-    memset18(&mut inp, fill_value);
+    memset19(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);
