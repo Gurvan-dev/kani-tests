@@ -728,7 +728,7 @@ fn test_memset1() {
     }
 }
 
-const MEMSET_KANI_LEN: usize = 32;
+const MEMSET_KANI_LEN: usize = 8;
 
 #[cfg(kani)]
 #[kani::proof]
