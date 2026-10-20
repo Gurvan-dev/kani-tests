@@ -74,6 +74,7 @@ pub fn memset4(inp: &mut [u8], fill_value: u8) {
     }
 }
 
+/*
 pub fn memset5(inp: &mut [u8], fill_value: u8) {
     let mut i = 0usize;
 
@@ -866,7 +867,7 @@ fn kani_memset11() {
     let fill_value: u8 = kani::any();
     let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
-    memset10(&mut inp, fill_value);
+    memset11(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);
@@ -1100,3 +1101,65 @@ fn kani_xor_cipher() {
         assert_eq!(inp[i], inp_old[i] ^ key[key_idx]);
     }
 }
+
+fn asm_abs(x: i64) -> u64 {
+    let result: u64;
+    let _sign: u64;
+    unsafe {
+        soft_asm!(
+            "srai {sign},   {x}, 63",
+            "xor  {result}, {x}, {sign}",
+            "sub  {result}, {result}, {sign}",
+            x      = in(reg)  x as u64,
+            sign   = out(reg) _sign,
+            result = out(reg) result,
+        );
+    }
+    result
+}
+
+fn asm_abs_i64(x: i64) -> i64 {
+    asm_abs(x) as i64
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_abs() {
+    let x: i64 = kani::any();
+    assert_eq!(asm_abs(x), x.unsigned_abs());
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_abs_i64() {
+    let x: i64 = kani::any();
+    assert_eq!(asm_abs_i64(x), x.wrapping_abs());
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_abs_nonneg() {
+    let x: i64 = kani::any();
+    kani::assume(x != i64::MIN);
+    assert!(asm_abs_i64(x) >= 0);
+}
+
+/*
+fn safe_div(dividend: u32, divisor: u32) -> u32 {
+    let result: u32;
+    unsafe {
+        soft_asm!(
+            "beqz {divisor}, zero_case",
+            "divuw {result}, {dividend}, {divisor}",
+            "j end",
+            "zero_case:",
+            "addi {result}, x0, 0",
+            "end:",
+            dividend = in(reg) dividend,
+            divisor = in(reg) divisor,
+            result = out(reg) result,
+        );
+    }
+    result
+}
+*/
