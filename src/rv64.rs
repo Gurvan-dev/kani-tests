@@ -74,7 +74,6 @@ pub fn memset4(inp: &mut [u8], fill_value: u8) {
     }
 }
 
-/*
 pub fn memset5(inp: &mut [u8], fill_value: u8) {
     let mut i = 0usize;
 
@@ -629,6 +628,47 @@ pub fn memset19(inp: &mut [u8], fill_value: u8) {
     }
 }
 
+pub fn memset20(inp: &mut [u8], fill_value: u8) {
+    #[allow(unused_imports)]
+    use ::softcore_asm_rv64::softcore_rv64::{
+        Core, Trap, ast,
+        prelude::bv,
+        raw::{self, csr_name_map_backwards, csrop, iop, rop, sop},
+        registers as reg,
+    };
+    #[allow(unused_imports)]
+    use ::softcore_asm_rv64::{FromRegister, handle_trap};
+
+    let mut len = inp.len();
+    let mut inp: &mut [u8] = inp;
+    let mut core = new_core(config::VECTOR_TEST);
+    core.reset();
+    while 0 < len {
+        unsafe {
+            core.set(reg::X2, fill_value as u64);
+            core.set(reg::X3, len as u64);
+            core.execute(ast::VSETVLI((
+                bv(1u64),
+                bv(1u64),
+                bv(0u64),
+                bv(0u64),
+                reg::X3,
+                reg::X1,
+            )));
+            core.execute(ast::MOVETYPEX((reg::X2, reg::V0)));
+            let elements = core.get_vec(reg::V0);
+            for i in 0..elements.len() {
+                let v = &elements[i];
+                let val = v.to_raw_le()[0];
+                inp[i] = val;
+            }
+            let vl: usize = core.get(reg::X1) as _;
+            len -= vl;
+            inp = &mut inp[vl..];
+        }
+    }
+}
+
 /* TODO: Use bitvector casts for address and value */
 
 pub fn memset_broken(inp: &mut [u8], fill_value: u8) {
@@ -972,6 +1012,19 @@ fn kani_memset19() {
     let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
 
     memset19(&mut inp, fill_value);
+
+    for i in 0..inp.len() {
+        assert_eq!(inp[i], fill_value);
+    }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn kani_memset20() {
+    let fill_value: u8 = kani::any();
+    let mut inp: [u8; MEMSET_KANI_LEN] = kani::any();
+
+    memset20(&mut inp, fill_value);
 
     for i in 0..inp.len() {
         assert_eq!(inp[i], fill_value);

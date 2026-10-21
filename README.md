@@ -64,3 +64,8 @@ details
 | add1 (len=1)                          | 921.48    | 15.52     | 0.25      |
 | add_full (len=4)                      | 1196.38   | 19.93     | 0.33      |
 | xor_cipher (inp_len=64, key_len=64)   | 13403.12  | 223.38    | 3.72      |
+
+## TODO
+
+We should add a new macro to add a local core in our functions when testing
+maybe
